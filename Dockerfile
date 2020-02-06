@@ -7,7 +7,8 @@ ENV pip_packages "ansible"
 # Create user 
 RUN adduser super && \
     usermod -a -G wheel super && \
-    echo "super:password" | chpasswd
+    echo "super:password" | chpasswd && \
+    chsh -s /bin/bash super
 
 
 RUN yum -y install openssh-server openssh-clients
@@ -54,6 +55,6 @@ RUN echo -e '[local]\nlocalhost ansible_connection=local' > /etc/ansible/hosts
 # RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
 
 RUN systemctl enable sshd
+RUN rm /usr/lib/tmpfiles.d/systemd-nologin.conf
 VOLUME ["/sys/fs/cgroup"]
-# CMD ["/usr/sbin/sshd", "-D"]
-CMD ["/usr/lib/systemd/systemd & && systemctl start systemd-user-sessions.service && tail -f /dev/null"]
+CMD ["/usr/sbin/init"]
